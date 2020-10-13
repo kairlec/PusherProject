@@ -107,6 +107,7 @@ target/
 /application.yml
 /statusCount.json
 /plugins/
+/wzxy.json
 
 # maven
 .mvn

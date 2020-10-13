@@ -3,24 +3,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!--parent>
-        <groupId>com.kairlec</groupId>
-        <artifactId>SKPusher-Project</artifactId>
-        <version>1.0.1</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent-->
-
-    <!--dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.3.3.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -39,15 +21,14 @@
         <jackson.version>2.11.2</jackson.version>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-
-        <pusher.project.version>1.0.1</pusher.project.version>
+        <pusher.project.version>1.0.2</pusher.project.version>
     </properties>
 
     <groupId>com.kairlec</groupId>
     <artifactId>Pusher</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>Pusher</name>
-    <description>基于微信和企业微信的消息推送/接受服务(主要基于企业微信)</description>
+    <description>基于企业微信的消息推送/接受服务</description>
 
     <dependencies>
         <dependency>
@@ -130,29 +111,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <!--plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.kairlec.pusher.PusherServerApplicationKt</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin-->
         </plugins>
     </build>
 

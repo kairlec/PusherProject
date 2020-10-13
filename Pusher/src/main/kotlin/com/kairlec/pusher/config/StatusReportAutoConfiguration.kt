@@ -1,14 +1,15 @@
 package com.kairlec.pusher.config
 
 import com.kairlec.pojo.PusherUser
+import com.kairlec.pusher.annotation.condition.StatusReportCondition
 import com.kairlec.pusher.config.properties.StatusReportProperties
-import com.kairlec.pusher.util.StatusCountUtil
 import com.kairlec.pusher.core.PusherException
 import com.kairlec.pusher.core.wework.WeWorkSenderHelper
+import com.kairlec.pusher.util.StatusCountUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Conditional
 import org.springframework.scheduling.Trigger
 import org.springframework.scheduling.annotation.SchedulingConfigurer
 import org.springframework.scheduling.config.ScheduledTaskRegistrar
@@ -21,7 +22,7 @@ import javax.annotation.PostConstruct
 
 
 @Component
-@ConditionalOnProperty(prefix = "wework.push", value = ["enabled", "status.enabled"], matchIfMissing = true)
+@Conditional(StatusReportCondition::class)
 class StatusReportAutoConfiguration : SchedulingConfigurer {
     @Autowired
     private lateinit var statusReportProperties: StatusReportProperties

@@ -2,16 +2,13 @@ package com.kairlec.pusher.controller
 
 import com.kairlec.error.SKException
 import com.kairlec.intf.ResponseDataInterface
-import com.kairlec.pojo.wechat.TemplateValue
 import com.kairlec.pojo.wework.MediaTypeEnum
-import com.kairlec.pusher.annotation.ResponseResult
 import com.kairlec.pusher.annotation.StatusCount
-import com.kairlec.pusher.config.properties.WeChatPusherProperties
-import com.kairlec.pusher.core.wechat.WeChatTemplateHelper
+import com.kairlec.pusher.annotation.condition.PusherCondition
 import com.kairlec.pusher.core.wework.WeWorkSenderHelper
 import com.kairlec.utils.ResponseDataUtil.responseOK
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Conditional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
@@ -21,18 +18,11 @@ import javax.servlet.http.HttpServletRequest
  */
 @RestController
 @RequestMapping(value = ["/push"], produces = ["application/json"])
-@ConditionalOnProperty(prefix = "wework.push", value = ["enabled"], matchIfMissing = true)
-@ResponseResult
+@Conditional(PusherCondition::class)
 class PusherController {
 
     @Autowired
     private lateinit var workSenderHelper: WeWorkSenderHelper
-
-    @Autowired(required = false)
-    private lateinit var weChatTemplateHelper: WeChatTemplateHelper
-
-    @Autowired(required = false)
-    private lateinit var weChatPusherProperties: WeChatPusherProperties
 
     /**
      * 获取推送文档
@@ -82,7 +72,8 @@ class PusherController {
     @StatusCount
     @RequestMapping(value = ["/markdown"], method = [RequestMethod.POST])
     fun markdown(@RequestAttribute(value = "touser") touser: String,
-                 @RequestParam(value = "content") content: String): ResponseDataInterface {
+                 @RequestParam(value = "content") content: String
+    ): ResponseDataInterface {
         workSenderHelper.sendMarkdown(content, workSenderHelper.withSettings.toUser(touser))
         return null.responseOK
     }
@@ -145,14 +136,6 @@ class PusherController {
         return null.responseOK
     }
 
-    @StatusCount
-    @RequestMapping(value = ["/test/template"])
-    @ConditionalOnProperty(prefix = "test.wechat.push", value = ["enabled"], matchIfMissing = false)
-    fun testTemplate(@RequestAttribute(value = "touser") touser: String,
-                     @RequestParam(value = "content") content: String): ResponseDataInterface {
-        weChatTemplateHelper.sendTemplate(touser, weChatPusherProperties.templateID, listOf(TemplateValue("content", content)).iterator())
-        return null.responseOK
-    }
 
     companion object {
         private var docHtml: String? = null

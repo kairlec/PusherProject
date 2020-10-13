@@ -1,8 +1,9 @@
 package com.kairlec.pusher.config.properties
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import com.kairlec.pusher.annotation.condition.PusherCondition
+import com.kairlec.pusher.annotation.condition.ReceiverCondition
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
+import org.springframework.context.annotation.Conditional
 import org.springframework.context.annotation.Configuration
 import org.springframework.validation.annotation.Validated
 import javax.validation.constraints.NotBlank
@@ -10,7 +11,7 @@ import javax.validation.constraints.NotBlank
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = "wework.config")
-@ConditionalOnProperty(prefix = "wework.receiver", value = ["enabled"], matchIfMissing = true)
+@Conditional(ReceiverCondition::class)
 data class ReceiverProperties(
         @NotBlank(message = "applicationReceivedToken(应用消息接收器token)不能为空")
         var applicationReceivedToken: String = "",

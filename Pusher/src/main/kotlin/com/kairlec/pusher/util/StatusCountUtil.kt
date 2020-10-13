@@ -2,8 +2,10 @@ package com.kairlec.pusher.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.kairlec.pusher.annotation.condition.StatusReportCondition
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Conditional
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.io.File
@@ -16,7 +18,7 @@ import javax.annotation.PreDestroy
  * 计数统计工具
  */
 @Component
-@ConditionalOnProperty(prefix = "wework.push", value = ["enabled", "status.enabled"], matchIfMissing = true)
+@Conditional(StatusReportCondition::class)
 class StatusCountUtil {
 
     /**

@@ -2,10 +2,9 @@ package com.kairlec.pusher.controller
 
 import com.kairlec.error.SKException
 import com.kairlec.intf.ResponseDataInterface
-import com.kairlec.pusher.annotation.OldPushBackwardsCompatibilityCondition
 import com.kairlec.pusher.annotation.StatusCount
+import com.kairlec.pusher.annotation.condition.OldPusherBackwardsCompatibilityCondition
 import com.kairlec.pusher.core.wework.WeWorkSenderHelper
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Conditional
 import org.springframework.web.bind.annotation.*
@@ -14,7 +13,7 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping(value = [""], produces = ["application/json"])
-@Conditional(OldPushBackwardsCompatibilityCondition::class)
+@Conditional(OldPusherBackwardsCompatibilityCondition::class)
 class OldPusherController {
 
     @Autowired
@@ -85,7 +84,6 @@ class OldPusherController {
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(OldPusherController::class.java)
         private var docHtml: String? = null
     }
 }

@@ -1,20 +1,22 @@
 package com.kairlec.pusher.config
 
+import com.kairlec.pusher.annotation.condition.ReceiveDSLCondition
+import com.kairlec.pusher.annotation.condition.ReceiverCondition
 import com.kairlec.pusher.config.properties.ReceiverProperties
 import com.kairlec.pusher.receiver.ReceiveInterface
 import com.kairlec.pusher.receiver.dsl.ReceiveDSL
 import com.qq.weixin.mp.aes.WXBizMsgCrypt
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Conditional
 import org.springframework.context.annotation.Configuration
 import java.io.File
 import java.net.URLClassLoader
 
 
 @Configuration
-@ConditionalOnProperty(prefix = "wework.receiver", value = ["enabled"], matchIfMissing = true)
+@Conditional(ReceiverCondition::class)
 class ReceiverAutoConfiguration {
 
     @Autowired
@@ -39,7 +41,7 @@ class ReceiverAutoConfiguration {
 
 
 @Configuration
-@ConditionalOnProperty(prefix = "wework", value = ["receiver.enabled", "receiverPluginDSLEnabled.enabled"], matchIfMissing = true)
+@Conditional(ReceiveDSLCondition::class)
 class ReceiveDSLAutoConfiguration {
 
     @Autowired

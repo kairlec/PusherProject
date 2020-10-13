@@ -1,7 +1,6 @@
 package com.kairlec.pusher.controller
 
 import com.kairlec.intf.ResponseDataInterface
-import com.kairlec.pusher.annotation.ResponseResult
 import com.kairlec.pusher.core.wework.WeWorkAddressBookHelper
 import com.kairlec.utils.ResponseDataUtil.responseOK
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping(value = ["/addressbook"], produces = ["application/json"])
 @ConditionalOnProperty(prefix = "wework.addressbook", value = ["enabled"], matchIfMissing = true)
-@ResponseResult
 class AddressBookController {
 
     @Autowired
@@ -37,7 +35,8 @@ class AddressBookController {
      */
     @RequestMapping(value = ["/department/{id}/user"], method = [RequestMethod.GET])
     fun getUserSimpleList(@PathVariable id: Int,
-                          @RequestParam(value = "fetchChild", required = false, defaultValue = "true") fetchChild: Boolean): ResponseDataInterface {
+                          @RequestParam(value = "fetchChild", required = false, defaultValue = "true") fetchChild: Boolean
+    ): ResponseDataInterface {
         return workAddressBookHelper.getUserSimpleList(id, fetchChild).responseOK
     }
 }
