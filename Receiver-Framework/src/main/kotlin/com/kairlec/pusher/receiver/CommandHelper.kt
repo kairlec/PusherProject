@@ -9,7 +9,7 @@ import kotlin.concurrent.withLock
  * @param commandString 原始命令行
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-open class CommandHelper(commandString: String,val msg:ReceiveMsg, private val separator: String = " ") : Iterator<String> {
+open class CommandHelper(commandString: String, val msg: ReceiveMsg, private val separator: String = " ") : Iterator<String> {
     /**
      * 原始命令
      */
@@ -101,10 +101,18 @@ open class CommandHelper(commandString: String,val msg:ReceiveMsg, private val s
         return currentCommandIndex < commandList.size - 1
     }
 
+    /**
+     * 前面是否还有命令
+     * @return 是否还有命令
+     */
     fun hasPrev(): Boolean {
         return currentCommandIndex <= 0
     }
 
+    /**
+     * 上一条无处理命令,需要预先判断[hasPrev]
+     * @return 上一条命令
+     */
     fun prev(): String {
         nextLock.withLock {
             currentCommandIndex--
@@ -112,10 +120,14 @@ open class CommandHelper(commandString: String,val msg:ReceiveMsg, private val s
         return current()
     }
 
+    /**
+     * 上一条已经过[String.trim]处理命令,需要预先判断[hasPrev]
+     * @return 上一条命令
+     */
     fun prevCommand() = prev().trim()
 
     /**
-     * 下一条已经过[String.trim]处理命令,需要预先判断hasNext()
+     * 下一条已经过[String.trim]处理命令,需要预先判断[hasNext]
      * @return 下一条命令
      */
     fun nextCommand() = next().trim()

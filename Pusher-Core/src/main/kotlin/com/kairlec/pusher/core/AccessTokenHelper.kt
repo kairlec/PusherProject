@@ -1,28 +1,63 @@
 package com.kairlec.pusher.core
 
-import com.fasterxml.jackson.databind.JsonNode
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
+import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.schedule
 import kotlin.concurrent.withLock
 import kotlin.properties.Delegates
 
 
+/**
+ * Token鉴权辅助器
+ */
 @Suppress("MemberVisibilityCanBePrivate", "SpellCheckingInspection")
 abstract class AccessTokenHelper(protected open val validateCertificateChains: Boolean) {
+    /**
+     * token字符串
+     */
     protected open lateinit var token: String
+
+    /**
+     * 下一次过期时间
+     */
     protected open lateinit var expiredTime: LocalDateTime
+
+    /**
+     * 过期时间
+     */
     protected open var expiresIn by Delegates.notNull<Long>()
-    protected open val scheduledExecutorService: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-    protected open lateinit var currentScheduledFuture: ScheduledFuture<*>
+
+    /**
+     * 更新锁
+     */
     protected open val updateLocker: Lock = ReentrantLock()
+
+    /**
+     * 更新url
+     */
     protected abstract val url: String
-    protected open fun update() {
+
+    /**
+     * 定时器
+     */
+    protected open var timer = nextTimer(1)
+
+    /**
+     * 更新定时器
+     */
+    protected fun nextTimer(delay: Long): TimerTask {
+        return Timer("AccessTokenHelperUpdater", false).schedule(delay) {
+            update()
+        }
+    }
+
+    /**
+     * 更新token
+     */
+    open fun update() {
         updateLocker.withLock {
             var tokenResult = ""
             Sender.get(url, validateCertificateChains)
@@ -33,9 +68,8 @@ abstract class AccessTokenHelper(protected open val validateCertificateChains: B
                             tokenResult = httpResponse.body()
                         }
                     }.join()
-            val jsonNode: JsonNode
-            try {
-                jsonNode = objectMapper.readTree(tokenResult)
+            val jsonNode = try {
+                objectMapper.readTree(tokenResult)
             } catch (e: Exception) {
                 throw PusherExceptions.AccessTokenException(-1, e)
             }
@@ -45,20 +79,20 @@ abstract class AccessTokenHelper(protected open val validateCertificateChains: B
             token = jsonNode["access_token"].asText()
             expiresIn = jsonNode["expires_in"].asLong()
             expiredTime = LocalDateTime.now().plusSeconds(expiresIn)
-            currentScheduledFuture = scheduledExecutorService.schedule({
-                update()
-            }, expiresIn, TimeUnit.SECONDS)
+            timer.cancel()
+            timer = nextTimer(expiresIn * 1000)
         }
     }
 
+    /**
+     * 获取token,若即将过期,则更新token后返回
+     */
     val accessToken: String
         get() {
             updateLocker.withLock { }
             val duration = Duration.between(LocalDateTime.now(), expiredTime)
             if (duration.toMinutes() < 5) {
-                if (!currentScheduledFuture.isDone && !currentScheduledFuture.isCancelled) {
-                    currentScheduledFuture.cancel(true)
-                }
+                timer.cancel()
                 update()
             }
             return token

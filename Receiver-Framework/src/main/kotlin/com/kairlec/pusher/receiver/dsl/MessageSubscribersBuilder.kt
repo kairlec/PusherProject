@@ -3,6 +3,11 @@
         "NAME_CONTAINS_ILLEGAL_CHARS", "FunctionName"
 )
 
+/**
+ * 请参阅mirai相关:
+ *
+ * https://github.com/mamoe/mirai
+ */
 package com.kairlec.pusher.receiver.dsl
 
 import com.kairlec.pusher.receiver.CommandHelper
@@ -226,33 +231,31 @@ open class MessageSubscribersBuilder<M : ReceiveMsg, out Ret, R : RR, RR>(
 
     /** [消息内容][ReceiveMsg.contentToString]可由正则表达式匹配([Regex.matchEntire]) */
     @MessageDsl
-    fun matching(regex: Regex): ListeningFilter = content { regex.matchEntire(it) != null }
+    fun matching(regex: Regex, trim: Boolean = true): ListeningFilter = content { regex.matchEntire(if (trim) it.trim() else it) != null }
 
 
     /** [消息内容][ReceiveMsg.contentToString]可由正则表达式匹配([Regex.matchEntire]), 就执行 `onEvent` */
     @MessageDsl
-    fun matching(regex: Regex, onEvent: @MessageDsl M.(MatchResult) -> Unit): Ret =
+    fun matching(regex: Regex, trim: Boolean = true, onEvent: @MessageDsl M.(MatchResult) -> Unit): Ret =
             always {
                 this@MessageSubscribersBuilder.executeAndReply(this) {
-                    onEvent.invoke(
-                            this,
-                            regex.matchEntire(it) ?: return@always this@MessageSubscribersBuilder.stub
+                    onEvent.invoke(this, regex.matchEntire(if (trim) it.trim() else it)
+                            ?: return@always this@MessageSubscribersBuilder.stub
                     )
                 }
             }
 
     /** [消息内容][ReceiveMsg.contentToString]可由正则表达式查找([Regex.find]) */
     @MessageDsl
-    fun finding(regex: Regex): ListeningFilter = content { regex.find(it) != null }
+    fun finding(regex: Regex, trim: Boolean = true): ListeningFilter = content { regex.find(if (trim) it.trim() else it) != null }
 
     /** [消息内容][ReceiveMsg.contentToString]可由正则表达式查找([Regex.find]), 就执行 `onEvent` */
     @MessageDsl
-    fun finding(regex: Regex, onEvent: @MessageDsl M.(MatchResult) -> Unit): Ret =
+    fun finding(regex: Regex, trim: Boolean = true, onEvent: @MessageDsl M.(MatchResult) -> Unit): Ret =
             always {
                 this@MessageSubscribersBuilder.executeAndReply(this) {
-                    onEvent.invoke(
-                            this,
-                            regex.find(it) ?: return@always this@MessageSubscribersBuilder.stub
+                    onEvent.invoke(this, regex.find(if (trim) it.trim() else it)
+                            ?: return@always this@MessageSubscribersBuilder.stub
                     )
                 }
             }
@@ -452,12 +455,12 @@ open class MessageSubscribersBuilder<M : ReceiveMsg, out Ret, R : RR, RR>(
      * 当消息content内容是命令行的时候就执行并回复 [replier] 的返回值
      */
     @MessageDsl
-    fun command(baseCommand: String? = null, replier: @MessageDsl (CommandHelper.(String) -> Any?)): Ret {
+    fun command(baseCommand: String? = null, ignoreCase: Boolean = false, replier: @MessageDsl (CommandHelper.(String) -> Any?)): Ret {
         return content({
             val helper = CommandHelper(contentToString(), this)
             if (helper.isValidCommand()) {
                 if (baseCommand != null) {
-                    helper.baseCommand() == baseCommand
+                    helper.baseCommand().equals(baseCommand, ignoreCase = ignoreCase)
                 } else {
                     true
                 }

@@ -3,6 +3,11 @@ package com.kairlec.pusher.receiver.msg
 import com.kairlec.pusher.receiver.reply.ReplyService
 import org.w3c.dom.Element
 
+/**
+ * 接受的链接消息
+ *
+ * API: https://work.weixin.qq.com/api/doc/90001/90143/90373#%E9%93%BE%E6%8E%A5%E6%B6%88%E6%81%AF
+ */
 class ReceiveLinkMsg private constructor(
         val title: String,
         val description: String,
@@ -14,6 +19,10 @@ class ReceiveLinkMsg private constructor(
 
     override fun contentToString(): String {
         return url
+    }
+
+    override fun toString(): String {
+        return contentToString()
     }
 
     companion object {

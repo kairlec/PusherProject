@@ -1,15 +1,12 @@
 package com.kairlec.pusher.controller
 
-import com.kairlec.pusher.annotation.condition.ReceiverCondition
-import com.kairlec.pusher.annotation.condition.ReplyReceiveMsgCondition
-import com.kairlec.pusher.receiver.ReceiveInterface
-import com.kairlec.pusher.receiver.dsl.ReceiveDSL
+import com.kairlec.pusher.openapi.context.MessageContext
+import com.kairlec.pusher.pojo.Plugin
 import com.kairlec.pusher.receiver.msg.ReceiveMsg
 import com.kairlec.pusher.util.ReplyReceiveMsgServiceImpl
 import com.qq.weixin.mp.aes.WXBizMsgCrypt
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Conditional
 import org.springframework.web.bind.annotation.*
 
 /**
@@ -17,21 +14,14 @@ import org.springframework.web.bind.annotation.*
  */
 @RestController
 @RequestMapping(value = ["/receive"])
-@Conditional(ReceiverCondition::class)
 class ReceiverController {
     private val logger = LoggerFactory.getLogger(ReceiverController::class.java)
 
     @Autowired
     private lateinit var wxBizMsgCrypt: WXBizMsgCrypt
 
-    @Autowired(required = false)
-    private lateinit var receiveDSL: ReceiveDSL
-
-    @Autowired(required = false)
-    private lateinit var replyReceiveMsgService: ReplyReceiveMsgServiceImpl
-
     @Autowired
-    private lateinit var receiver: ReceiveInterface
+    private lateinit var replyReceiveMsgService: ReplyReceiveMsgServiceImpl
 
     /**
      * 接受信息接口
@@ -42,8 +32,7 @@ class ReceiverController {
      * @return 返回的消息原生内容
      */
     @Suppress("SENSELESS_COMPARISON")
-    @RequestMapping(value = [""], method = [RequestMethod.POST])
-    @Conditional(ReplyReceiveMsgCondition::class)
+    @RequestMapping(value = ["/"], method = [RequestMethod.POST])
     fun receive(@RequestParam("msg_signature") msgSignature: String,
                 @RequestParam("timestamp") timestamp: String,
                 @RequestParam("nonce") nonce: String,
@@ -52,18 +41,18 @@ class ReceiverController {
         val rawMsg = wxBizMsgCrypt.DecryptMsg(msgSignature, timestamp, nonce, postData)
         val msg = ReceiveMsg.parse(rawMsg, replyReceiveMsgService) ?: return ""
         logger.info("Received message from [${msg.fromUserName}] :${msg.contentToString()}")
-        return if (replyReceiveMsgService != null && receiveDSL != null) {
-            receiveDSL.send(msg)
+        val result = Plugin.Invoker.onReceiveMessage(MessageContext(msg))
+        return if (result == null) {
             ""
         } else {
-            wxBizMsgCrypt.EncryptMsg(receiver.onReceive(msg).raw, "", nonce)
+            wxBizMsgCrypt.EncryptMsg(result.raw, "", nonce)
         }
     }
 
     /**
      * 验证URL接口
      */
-    @RequestMapping(value = [""], method = [RequestMethod.GET])
+    @RequestMapping(value = ["/"], method = [RequestMethod.GET])
     fun verify(@RequestParam("msg_signature") msgSignature: String,
                @RequestParam("timestamp") timestamp: String,
                @RequestParam("nonce") nonce: String,
@@ -71,7 +60,7 @@ class ReceiverController {
     ): String {
         logger.info("verifying...")
         val result = wxBizMsgCrypt.VerifyURL(msgSignature, timestamp, nonce, echostr)
-        if(logger.isDebugEnabled) {
+        if (logger.isDebugEnabled) {
             logger.debug("result=${result}")
         }
         return result

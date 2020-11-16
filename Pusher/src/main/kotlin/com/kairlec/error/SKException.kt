@@ -38,13 +38,17 @@ class SKException : RuntimeException {
     enum class ServiceErrorEnum(override val code: Int, override val msg: String, override var data: Any? = null, @get:JsonIgnore override var status: HttpStatus = HttpStatus.OK) : ResponseDataInterface {
         NO_ERROR(0, "OK"),
         NO_ERROR_BACKWARDS_COMPATIBILITY_WARN(0, "向下兼容模式,当前请求的是老API,请尽量使用新API"),
+        NO_ERROR_FILTERED(0, "消息已被过滤"),
         UNKNOWN_REQUEST(80000, "未知请求", null, HttpStatus.BAD_REQUEST),
+        UNKNOWN_PARAMETER(80001, "未知参数", null, HttpStatus.BAD_REQUEST),
         NO_SUCH_USER(10001, "无此用户", null, HttpStatus.UNAUTHORIZED),
         PERMISSION_DENIED(10002, "没有权限", null, HttpStatus.UNAUTHORIZED),
         VERIFICATION_FAILED(10003, "验证失败", null, HttpStatus.UNAUTHORIZED),
         EMPTY_DATA(10004, "数据为空", null, HttpStatus.BAD_REQUEST),
-        MISSING_REQUEST_PART(10005, "缺少请求内容", HttpStatus.BAD_REQUEST),
-        AN_EXCEPTION_OCCURRED(90003, "服务异常", HttpStatus.BAD_GATEWAY),
+        MISSING_REQUEST_PART(10005, "缺少请求内容", null, HttpStatus.BAD_REQUEST),
+        MISSING_REQUEST_HEADER(10006, "缺少请求头", null, HttpStatus.BAD_REQUEST),
+        MULTI_USER(10007, "匹配多个用户", null, HttpStatus.UNAUTHORIZED),
+        AN_EXCEPTION_OCCURRED(90003, "服务异常", null, HttpStatus.BAD_GATEWAY),
         NOT_YET_SUPPORTED(90004, "尚未支持", null, HttpStatus.BAD_GATEWAY),
         ;
 

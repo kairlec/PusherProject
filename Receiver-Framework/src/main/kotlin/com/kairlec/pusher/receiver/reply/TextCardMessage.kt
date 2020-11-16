@@ -6,4 +6,13 @@ class TextCardMessage(
         val url: String,
         val btntxt: String? = null,
         val toUser: String
-) : Message
+) : Message {
+
+    override fun contentToString(): String {
+        return description
+    }
+
+    override fun toString(): String {
+        return contentToString()
+    }
+}

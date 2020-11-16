@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.SerializationConfig
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider
 import com.fasterxml.jackson.databind.ser.SerializerFactory
 
-
+/**
+ * 自定义序列化提供程序
+ */
 class CustomSerializerProvider : DefaultSerializerProvider {
     constructor() : super()
     constructor(provider: CustomSerializerProvider, config: SerializationConfig, jsf: SerializerFactory) : super(provider, config, jsf)

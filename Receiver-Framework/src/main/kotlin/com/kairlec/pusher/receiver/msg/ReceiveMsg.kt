@@ -9,6 +9,9 @@ import org.xml.sax.InputSource
 import java.io.StringReader
 import javax.xml.parsers.DocumentBuilderFactory
 
+/**
+ * 接受到的消息(基类)
+ */
 open class ReceiveMsg(
         open val replyService: ReplyService,
         open val agentID: Long,
@@ -34,6 +37,10 @@ open class ReceiveMsg(
 
     open fun contentToString(): String {
         return "$fromUserName:[$msgType]"
+    }
+
+    override fun toString(): String {
+        return contentToString()
     }
 
     constructor(replyService: ReplyService, receiveMsg: ReceiveMsg) :
@@ -90,5 +97,6 @@ open class ReceiveMsg(
 
     @JvmSynthetic
     internal fun CommandHelper.directReply(plain: String) = replyService.reply(TextMessage(plain, fromUserName))
+
 
 }

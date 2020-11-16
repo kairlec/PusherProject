@@ -4,7 +4,7 @@ import java.io.File
 import java.io.InputStream
 
 
-class VideoMessage :Message{
+class VideoMessage : Message {
     val videoByteArray: ByteArray
     val toUser: String
     val filename: String
@@ -24,9 +24,17 @@ class VideoMessage :Message{
         this.toUser = toUser
     }
 
-    constructor(videoFile: File, filename: String=videoFile.name, toUser: String) {
+    constructor(videoFile: File, filename: String = videoFile.name, toUser: String) {
         this.filename = filename
         this.videoByteArray = videoFile.readBytes()
         this.toUser = toUser
+    }
+
+    override fun contentToString(): String {
+        return "[Video Data:$filename]"
+    }
+
+    override fun toString(): String {
+        return contentToString()
     }
 }

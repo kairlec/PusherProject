@@ -3,7 +3,7 @@ package com.kairlec.pusher.receiver.reply
 import java.io.File
 import java.io.InputStream
 
-class ImageMessage :Message{
+class ImageMessage : Message {
     val imageByteArray: ByteArray
     val toUser: String
     val filename: String
@@ -27,5 +27,13 @@ class ImageMessage :Message{
         this.filename = filename
         this.imageByteArray = imageFile.readBytes()
         this.toUser = toUser
+    }
+
+    override fun contentToString(): String {
+        return "[Image Data:$filename]"
+    }
+
+    override fun toString(): String {
+        return contentToString()
     }
 }

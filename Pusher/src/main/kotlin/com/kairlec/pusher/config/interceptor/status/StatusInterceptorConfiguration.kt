@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 @Conditional(StatusReportCondition::class)
-class StatusInterceptorConfiguration: WebMvcConfigurer {
+class StatusInterceptorConfiguration : WebMvcConfigurer {
     @Bean
     fun statusInterceptorFactory(): StatusInterceptor {
         return StatusInterceptor()
@@ -18,4 +18,5 @@ class StatusInterceptorConfiguration: WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(statusInterceptorFactory()).addPathPatterns("/push/**").addPathPatterns("/*").addPathPatterns("*")
     }
+
 }

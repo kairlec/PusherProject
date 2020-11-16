@@ -8,4 +8,13 @@ class MpNewsMessage(
         val contentSourceUrl: String? = null,
         val digest: String? = null,
         val toUser: String
-) : Message
+) : Message {
+
+    override fun contentToString(): String {
+        return content
+    }
+
+    override fun toString(): String {
+        return contentToString()
+    }
+}

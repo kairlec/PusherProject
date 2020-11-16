@@ -3,6 +3,11 @@ package com.kairlec.pusher.receiver.msg
 import com.kairlec.pusher.receiver.reply.ReplyService
 import org.w3c.dom.Element
 
+/**
+ * 接受的位置消息
+ *
+ * API: https://work.weixin.qq.com/api/doc/90001/90143/90373#%E4%BD%8D%E7%BD%AE%E6%B6%88%E6%81%AF
+ */
 class ReceiveLocationMsg private constructor(
         val locationX: Double,
         val locationY: Double,
@@ -15,6 +20,10 @@ class ReceiveLocationMsg private constructor(
 
     override fun contentToString(): String {
         return "$label ($locationX,$locationY)[x$scale]"
+    }
+
+    override fun toString(): String {
+        return contentToString()
     }
 
     companion object {

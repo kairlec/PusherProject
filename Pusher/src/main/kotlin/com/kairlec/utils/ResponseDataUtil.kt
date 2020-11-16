@@ -5,6 +5,7 @@ import com.kairlec.intf.ResponseDataInterface
 import com.kairlec.pusher.core.PusherException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.MissingRequestHeaderException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.multipart.support.MissingServletRequestPartException
 import java.io.ByteArrayOutputStream
@@ -60,6 +61,10 @@ object ResponseDataUtil {
             if (this is MissingServletRequestParameterException) {
                 logger.error("a MissingServletRequestParameterException has throwout:${this.message}")
                 return SKException.ServiceErrorEnum.MISSING_REQUEST_PART.data("[${this.parameterType}]${this.parameterName}")
+            }
+            if(this is MissingRequestHeaderException){
+                logger.warn("a MissingRequestHeaderException has throwout:${this.message}")
+                return SKException.ServiceErrorEnum.MISSING_REQUEST_HEADER.data("[${this.parameter.parameterType}]${this.headerName}")
             }
             logger.error("a Exception has throwout:${this.message}")
             return SKException.ServiceErrorEnum.fromException(this)

@@ -1,16 +1,13 @@
 package com.kairlec.pusher.util
 
-import com.kairlec.pojo.wework.MediaTypeEnum
-import com.kairlec.pusher.annotation.condition.ReplyReceiveMsgCondition
 import com.kairlec.pusher.core.wework.WeWorkSenderHelper
+import com.kairlec.pusher.pojo.wework.MediaTypeEnum
 import com.kairlec.pusher.receiver.reply.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Conditional
 import org.springframework.stereotype.Component
 
 @Component
-@Conditional(ReplyReceiveMsgCondition::class)
 class ReplyReceiveMsgServiceImpl : ReplyService {
 
     private val logger = LoggerFactory.getLogger(ReplyReceiveMsgServiceImpl::class.java)

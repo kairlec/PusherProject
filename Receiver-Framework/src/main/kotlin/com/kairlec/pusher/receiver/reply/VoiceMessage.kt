@@ -4,7 +4,7 @@ import java.io.File
 import java.io.InputStream
 
 
-class VoiceMessage :Message{
+class VoiceMessage : Message {
     val voiceByteArray: ByteArray
     val toUser: String
     val filename: String
@@ -28,5 +28,13 @@ class VoiceMessage :Message{
         this.filename = filename
         this.voiceByteArray = voiceFile.readBytes()
         this.toUser = toUser
+    }
+
+    override fun contentToString(): String {
+        return "[Voice Data:$filename]"
+    }
+
+    override fun toString(): String {
+        return contentToString()
     }
 }

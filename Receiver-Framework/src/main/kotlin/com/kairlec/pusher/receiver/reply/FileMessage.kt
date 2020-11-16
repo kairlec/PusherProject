@@ -4,7 +4,7 @@ import java.io.File
 import java.io.InputStream
 
 
-class FileMessage :Message{
+class FileMessage : Message {
     val fileByteArray: ByteArray
     val toUser: String
     val filename: String
@@ -28,5 +28,13 @@ class FileMessage :Message{
         this.filename = filename
         this.fileByteArray = fileFile.readBytes()
         this.toUser = toUser
+    }
+
+    override fun contentToString(): String {
+        return "[File Data:$filename]"
+    }
+
+    override fun toString(): String {
+        return contentToString()
     }
 }

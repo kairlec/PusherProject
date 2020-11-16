@@ -90,6 +90,7 @@ hs_err_pid*
 
 # framework impl
 /ReceiverImpl/
+/CheckInBox/
 
 # test
 /Pusher/src/test/kotlin/*
@@ -108,6 +109,9 @@ target/
 /statusCount.json
 /plugins/
 /wzxy.json
+/scripts
+/database
 
 # maven
 .mvn
+CheckInBox/pom.xml

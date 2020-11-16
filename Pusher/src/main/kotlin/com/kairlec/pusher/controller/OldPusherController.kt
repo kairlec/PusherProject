@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest
 
 
 @RestController
-@RequestMapping(value = [""], produces = ["application/json"])
+@RequestMapping(value = ["/"], produces = ["application/json"])
 @Conditional(OldPusherBackwardsCompatibilityCondition::class)
 class OldPusherController {
 

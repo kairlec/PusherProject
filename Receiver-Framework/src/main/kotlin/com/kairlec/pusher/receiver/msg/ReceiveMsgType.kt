@@ -2,6 +2,9 @@ package com.kairlec.pusher.receiver.msg
 
 import kotlin.reflect.KClass
 
+/**
+ * 消息类型
+ */
 @Suppress("UNCHECKED_CAST")
 enum class ReceiveMsgType(val type: String, val clazz: KClass<ReceiveMsg>) {
     TEXT("text", ReceiveTextMsg::class as KClass<ReceiveMsg>),

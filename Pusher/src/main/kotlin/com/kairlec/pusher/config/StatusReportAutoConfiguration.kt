@@ -1,10 +1,12 @@
 package com.kairlec.pusher.config
 
-import com.kairlec.pojo.PusherUser
 import com.kairlec.pusher.annotation.condition.StatusReportCondition
 import com.kairlec.pusher.config.properties.StatusReportProperties
 import com.kairlec.pusher.core.PusherException
 import com.kairlec.pusher.core.wework.WeWorkSenderHelper
+import com.kairlec.pusher.openapi.context.SendStatusContext
+import com.kairlec.pusher.pojo.Plugin
+import com.kairlec.pusher.service.impl.UserServiceImpl
 import com.kairlec.pusher.util.StatusCountUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,7 +17,6 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer
 import org.springframework.scheduling.config.ScheduledTaskRegistrar
 import org.springframework.scheduling.support.CronTrigger
 import org.springframework.stereotype.Component
-import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.annotation.PostConstruct
@@ -34,51 +35,35 @@ class StatusReportAutoConfiguration : SchedulingConfigurer {
     private lateinit var statusCountUtil: StatusCountUtil
 
     @Autowired
-    private lateinit var pusherUsers: Map<String, *>
+    private lateinit var userService: UserServiceImpl
 
     @Value("\${version}")
     private lateinit var version: String
 
     @PostConstruct
     fun init() {
-        for (pusherUserEntry in pusherUsers) {
-            val user = pusherUserEntry.value as PusherUser
-            if (user.admin) {
-                try {
-                    workSenderHelper.sendText("Pusher服务(v${version})已在时间:${LocalDateTime.now().format(dateTimeFormatter)}成功启动", workSenderHelper.withSettings.toUser(pusherUserEntry.key))
-                } catch (e: PusherException) {
-                    logger.error("${e.code} => ${e.message}")
-                }
+        val admins = userService.getAllAdmin()
+        for (user in admins) {
+            try {
+                workSenderHelper.sendText("Pusher服务(v${version})已在时间:${LocalDateTime.now().format(dateTimeFormatter)}成功启动", workSenderHelper.withSettings.toUser(user.userid))
+            } catch (e: PusherException) {
+                logger.error("${e.code} => ${e.message}")
             }
         }
         val task = Runnable {
-            for (pusherUserEntry in pusherUsers) {
-                val user = pusherUserEntry.value as PusherUser
-                if (user.admin) {
-                    try {
-                        workSenderHelper.sendText(buildStatusText()
-                                , workSenderHelper.withSettings.toUser(pusherUserEntry.key))
-                    } catch (e: PusherException) {
-                        logger.error("${e.code} => ${e.message}")
-                    }
-                }
-            }
+            Plugin.Invoker.onSendStatus(SendStatusContext(
+                    statusCountUtil.beginTime,
+                    statusCountUtil.successCount,
+                    statusCountUtil.errorCount,
+                    statusCountUtil.todaySuccessCount,
+                    statusCountUtil.todayErrorCount,
+                    admins
+            ))
         }
         this.task = task
     }
 
     lateinit var task: Runnable
-
-    fun buildStatusText(): String {
-        return """
-               Pusher服务启动时间:${statusCountUtil.beginTime.format(dateTimeFormatter)}
-               已运行:${String.format("%.2f", Duration.between(statusCountUtil.beginTime, LocalDateTime.now()).toMinutes().toDouble() / 60)}小时
-               总请求次数:${statusCountUtil.successCount + statusCountUtil.errorCount}
-               总成功次数:${statusCountUtil.successCount}
-               今日请求次数:${statusCountUtil.todaySuccessCount + statusCountUtil.todayErrorCount}
-               今日成功次数:${statusCountUtil.todaySuccessCount}
-               """.trimIndent()
-    }
 
     override fun configureTasks(taskRegistrar: ScheduledTaskRegistrar) {
         val trigger = Trigger { triggerContext ->

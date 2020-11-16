@@ -2,13 +2,11 @@ package com.kairlec.pusher.controller
 
 import com.kairlec.error.SKException
 import com.kairlec.intf.ResponseDataInterface
-import com.kairlec.pojo.wework.MediaTypeEnum
 import com.kairlec.pusher.annotation.StatusCount
-import com.kairlec.pusher.annotation.condition.PusherCondition
 import com.kairlec.pusher.core.wework.WeWorkSenderHelper
+import com.kairlec.pusher.pojo.wework.MediaTypeEnum
 import com.kairlec.utils.ResponseDataUtil.responseOK
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Conditional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
@@ -18,7 +16,6 @@ import javax.servlet.http.HttpServletRequest
  */
 @RestController
 @RequestMapping(value = ["/push"], produces = ["application/json"])
-@Conditional(PusherCondition::class)
 class PusherController {
 
     @Autowired
@@ -109,8 +106,8 @@ class PusherController {
     @StatusCount
     @RequestMapping(value = ["/video"], method = [RequestMethod.POST])
     fun video(@RequestAttribute(value = "touser") touser: String,
-              @RequestAttribute(value = "title", required = false) title: String?,
-              @RequestAttribute(value = "description", required = false) description: String?,
+              @RequestParam(value = "title", required = false) title: String?,
+              @RequestParam(value = "description", required = false) description: String?,
               @RequestParam("file") file: MultipartFile
     ): ResponseDataInterface {
         if (file.isEmpty) {
