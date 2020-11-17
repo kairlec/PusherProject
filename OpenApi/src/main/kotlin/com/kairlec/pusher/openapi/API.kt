@@ -59,4 +59,12 @@ interface API {
      * 获取回复服务
      */
     fun getReplyService(): ReplyService
+
+    /**
+     * 注册Controller
+     * @param beanName 注册的Bean名称
+     * @param controllerClass 指定的Controller类,该类应当有诸如[org.springframework.web.bind.annotation.RestController],[org.springframework.web.bind.annotation.ControllerAdvice],[org.springframework.stereotype.Controller]等注解
+     */
+    fun registerController(beanName: String, controllerClass: Class<*>)
+
 }

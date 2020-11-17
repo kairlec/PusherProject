@@ -91,7 +91,6 @@ class PusherUser {
      */
     @OneToOne
     var pushConfig: PusherUserPushConfig = PusherUserPushConfig(this)
-        private set
 
     /**
      * 验证密码

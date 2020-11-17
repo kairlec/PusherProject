@@ -83,6 +83,10 @@ class UserServiceImpl : UserService {
     }
 
     override fun addOrUpdate(user: PusherUser): PusherUser {
+        @Suppress("SENSELESS_COMPARISON")
+        if (user.pushConfig == null) {
+            user.pushConfig = PusherUserPushConfig(user)
+        }
         userPushConfigRepository.save(user.pushConfig)
         return userDTORepository.save(user)
     }

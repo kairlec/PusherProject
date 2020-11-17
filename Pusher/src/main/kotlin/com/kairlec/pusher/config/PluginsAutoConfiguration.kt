@@ -17,10 +17,15 @@ import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.support.BeanDefinitionBuilder
+import org.springframework.beans.factory.support.DefaultListableBeanFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Conditional
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import java.io.File
+import java.lang.reflect.Method
 import java.net.URLClassLoader
 import java.util.*
 import java.util.jar.JarEntry
@@ -35,6 +40,9 @@ class APIImpl : API {
 
     @Autowired
     private lateinit var replyService: ReplyService
+
+    @Autowired
+    private lateinit var applicationContext: ApplicationContext
 
     override fun getAdminUser(): List<PusherUser> {
         return userService.getAllAdmin()
@@ -70,6 +78,16 @@ class APIImpl : API {
 
     override fun getReplyService(): ReplyService {
         return replyService
+    }
+
+    override fun registerController(beanName: String, controllerClass: Class<*>) {
+        val requestMappingHandlerMapping = applicationContext.getBean("requestMappingHandlerMapping") as RequestMappingHandlerMapping
+        val defaultListableBeanFactory: DefaultListableBeanFactory = applicationContext.autowireCapableBeanFactory as DefaultListableBeanFactory
+        val beanDefinitionBuilder: BeanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(controllerClass)
+        defaultListableBeanFactory.registerBeanDefinition(beanName, beanDefinitionBuilder.beanDefinition)
+        val method: Method = RequestMappingHandlerMapping::class.java.superclass.superclass.getDeclaredMethod("detectHandlerMethods", Any::class.java)
+        method.isAccessible = true
+        method.invoke(requestMappingHandlerMapping, beanName)
     }
 
 }
