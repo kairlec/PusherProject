@@ -22,6 +22,7 @@ object ResponseDataUtil {
         get() = SKException.ServiceErrorEnum.NO_ERROR.data(this)
 
     fun Exception.getTrackMessage(): String {
+        
         lateinit var expMessage: String
         ByteArrayOutputStream().use {
             this.printStackTrace(PrintWriter(it, true))

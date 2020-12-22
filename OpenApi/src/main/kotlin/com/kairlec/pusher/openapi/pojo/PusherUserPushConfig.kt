@@ -142,15 +142,15 @@ enum class SubscriberLevel(var intLevel: Int) {
     /**
      * CUSTOM,自定义的消息级别,可自由更改消息等级值,以便活动接受自定义级别
      */
-    CUSTOM(INFO),
+    CUSTOM(400),
     ;
 
-    /**
-     * 创建的克隆消息订阅器
-     */
-    constructor(refLevel: SubscriberLevel) {
-        intLevel = refLevel.intLevel
-    }
+//    /**
+//     * 创建的克隆消息订阅器
+//     */
+//    constructor(refLevel: SubscriberLevel) {
+//        intLevel = refLevel.intLevel
+//    }
 
     /**
      * 自定义级别数值

@@ -21,7 +21,11 @@ class PusherUser {
             pusherUser.username = userDTO.getUsername()
             pusherUser.openUserId = userDTO.getOpenUserId()
             pusherUser.salt = userDTO.getSalt()
-            pusherUser.pushConfig = userDTO.getPushConfig()
+            @Suppress("RedundantNullableReturnType")
+            val pushConfig: PusherUserPushConfig? = userDTO.getPushConfig()
+            if (pushConfig != null) {
+                pusherUser.pushConfig = pushConfig
+            }
             pusherUser.config = null
             return pusherUser
         }
@@ -110,7 +114,8 @@ class PusherUser {
 
     operator fun <T : Any> set(key: String, value: T): Any? = config?.put(key, value)
 
-    inline operator fun <reified T : Any> get(key: String): T? = config?.get(key)?.let { objectMapper.convertValue<T>(it) }
+    inline operator fun <reified T : Any> get(key: String): T? =
+        config?.get(key)?.let { objectMapper.convertValue<T>(it) }
 
     override fun toString(): String {
         return "PusherUser(userid=$userid, token=$token, admin=$admin, username=$username, openUserId=$openUserId, salt=$salt, config=$config)"
